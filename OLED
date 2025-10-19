@@ -1,0 +1,88 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128  // OLED display width, in pixels
+#define SCREEN_HEIGHT 64  // OLED display height, in pixels
+#define OLED_RESET -1     // Reset pin (or -1 if shared with Arduino reset)
+#define SCREEN_ADDRESS 0x3C  // Most common I2C address for OLEDs
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+const int PulseSensorPin = A0;       // Finger press detection
+const int touchThreshold = 520;
+
+bool fingerTouching = false;
+int bpm = 60;           // Start BPM
+int finalBPM = 0;
+int targetBPM = 0;      // Random target BPM to stop at
+unsigned long lastUpdateTime = 0;
+
+void setup() {
+  Serial.begin(9600);
+
+  // Initialize OLED
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;); // Don't proceed, loop forever
+  }
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println("Hold sensor to");
+  display.setCursor(0, 10);
+  display.println("get BPM...");
+  display.display();
+}
+
+void loop() {
+  int signal = analogRead(PulseSensorPin);
+
+  if (signal > touchThreshold) {
+    if (!fingerTouching) {
+      fingerTouching = true;
+      bpm = 60;
+      targetBPM = random(60, 101);
+      display.clearDisplay();
+      display.setTextSize(1);
+      display.setCursor(0, 0);
+      display.println("Measuring...");
+      display.display();
+    }
+
+    // Gradually increase BPM until target
+    if (millis() - lastUpdateTime > 300 && bpm < targetBPM) {
+      bpm += random(1, 4);
+      if (bpm > targetBPM) bpm = targetBPM;
+
+      display.setTextSize(1);
+      display.setCursor(0, 20);
+      display.println("                "); // Clear line
+      display.setCursor(0, 20);
+      display.print("BPM: ");
+      display.println(bpm);
+      display.display();
+
+      lastUpdateTime = millis();
+    }
+
+  } else {
+    if (fingerTouching) {
+      finalBPM = bpm;
+      display.clearDisplay();
+      display.setTextSize(1);
+      display.setCursor(0, 0);
+      display.println("Final BPM:");
+      display.setCursor(0, 10);
+      display.print("BPM: ");
+      display.println(finalBPM);
+      display.display();
+
+      fingerTouching = false;
+    }
+  }
+
+  delay(10);
+}
