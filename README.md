@@ -4,7 +4,7 @@
 - The system intelligently switches between pulse measurement and ECG waveform display based on user interaction, making it suitable for educational, healthcare, and IoT-based monitoring applications.
 
 ## Features
--Real-time heart rate (BPM) calculation
+- Real-time heart rate (BPM) calculation
 - ECG waveform acquisition using AD8232
 - Automatic mode switching (Pulse → ECG)
 - OLED display for live data visualization
@@ -27,7 +27,7 @@ git clone https://github.com/your-username/pulse-ecg-monitor.git
 - OLED Display:
 * BPM in pulse mode
 * ECG signal visualization
--Serial Plotter:
+- Serial Plotter:
 * Continuous ECG waveform
 
 ## Challenges
