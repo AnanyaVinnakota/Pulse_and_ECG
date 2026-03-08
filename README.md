@@ -158,5 +158,3 @@ Possible improvements for the project include:
 This project is developed for **educational and research purposes**.
 
 
-These make hardware projects look **much more professional.**
-
